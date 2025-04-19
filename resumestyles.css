@@ -1,0 +1,54 @@
+h2,h3{
+    text-align: center;
+}
+ul,li{
+font-family: 'Times New Roman', Times, serif;
+}
+h1{
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif !important;
+}
+body{
+    a{
+      color: rgba(255, 255, 255, 0.785);  
+    }
+}
+p{
+    font-family: 'Times New Roman', Times, serif !important;
+}
+h5, p {
+    margin: 0;
+    padding: 0;
+
+  }
+  .fulline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+  
+  }
+ /* Custom container style to keep everything centered */
+.container {
+    max-width: 90%; /* Adjust width to your preference */
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Style for the long list, ensuring it doesn't overflow */
+  .no-wrap-list {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    list-style-type: none; /* Remove bullets if you want */
+    margin: 0;
+    width: auto; /* Ensures it doesn't stretch too far */
+  }
+  
+  /* Ensure list items stay on one line and handle overflow */
+  .no-wrap-list li {
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hides any overflow text */
+    text-overflow: ellipsis; /* Adds "..." for overflow text (optional) */
+    margin-bottom: 0.5rem; /* Spacing between items (optional) */
+  }
+ 

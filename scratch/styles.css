@@ -1,0 +1,67 @@
+body {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color: rgba(128, 0, 128, 0.766);
+    color: black 
+}
+a {
+    color: gold;
+}
+
+h1,
+h4 {
+    text-align: center;
+}
+
+img {
+    border: 5px solid gold;
+    /* padding: 5px; */
+    height: 350px;
+    /* margin: auto; */
+    /* display: block; */
+}
+h3{
+    font-size: x-large;
+    text-align: center;
+}
+p{
+    text-align: center;
+    border: 5px solid gold;
+    padding: 30px 1rem;
+    font-size: 17px;
+    /* background-color: rgba(128, 0, 128, 0.305); */
+    line-height: 1.6;
+    
+}
+ol{
+    border: 5px solid gold;
+    padding: 25px 25px 1rem;
+    /* background-color: rgba(128, 0, 128, 0.496); */
+    line-height: 1.55;
+   font-size: 16px;
+    
+}
+h2{
+    text-align: center;
+}
+/* . means non existing element, can apply it to a certain aspect, such as heading 1 */
+/* .rizz {
+    font-family: 'Courier New', Courier, monospace;
+    color: hotpink;
+    border: 5px dashed yellow;
+    font-size: 400%;
+    font-weight: bolder;
+    background-color: limegreen;
+} */
+
+/* .rizz:hover {
+    font-size: 450%;
+    color: red;
+    border: 5px solid cyan;
+
+} */
+
+/* li:hover {
+    text-decoration: underline;
+    background-color: rgb(100, 100, 100);
+    width: fit-content;
+} */

@@ -1,0 +1,102 @@
+.common{
+    /* . becuase we are making it up */
+    /* border: 2px solid white; */
+    position: absolute;
+    /* absolute means i assume nothing but top left */
+}
+
+.nav{
+    /* relatively postition as far right as it can */
+    position: relative;
+    float: right;
+    font-size: 75%;
+}
+
+.footer{
+    /* left side is 0px away from the left side of screen, and similar to rest */
+    position: fixed;
+    bottom: 0px; 
+    left: 0px;
+    right: 0px;
+    /* 50% makes it half the size it normally is  */
+    font-size: 50%;
+    font-style: italic;
+    text-align: center; 
+    background-color: rgba(253, 229, 96, 0.673);
+    color: black;
+}
+
+.header{
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    /* puts the header in the center */
+    text-align: center;
+    /* z depth it will make it deeper you so that you can click on links, one is above the other */
+    z-index: -1;
+}
+
+.content{
+    top: 70px;
+    left: 10%;
+    right: 10%;
+    /* bottom: 45px; */
+    /* background-color: rgba(119, 168, 167, 0.5); */
+}
+
+.stats{
+width: 100px;
+height: auto;
+}
+
+.highlight{
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: gold;
+}
+
+* {
+    box-sizing: border-box;
+}
+.content-wrapper {
+    display: flex;
+    justify-content: space-between; /* Space between left and right content */
+    align-items: flex-start; /* Align content to the top */
+    gap: 30px; /* Space between the video/accomplishments and viz */
+    margin-top: 20px;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+/* Left content (accomplishments) */
+.accomplishments {
+    flex: 1; /* Flex property for auto resizing */
+    min-width: 300px; /* Ensures it doesn't shrink too much on small screens */
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Video section */
+.video {
+    width: 560px; /* Fixed width for the iframe */
+}
+
+/* Ensure iframe is responsive */
+.video iframe {
+    width: 100%;
+    height: 400px;
+    border: 5px solid gold /* Optional border for iframe */
+}
+
+/* Tableau viz container */
+.viz-container {
+    margin-left:50px; /* Push to the right side */
+    flex: 1; /* Allows the viz to take up remaining space */
+}
+
+/* Ensure Tableau viz takes full width, no squishing */
+.viz-container object {
+    width: 100% !important;
+    height: 700px !important;
+}

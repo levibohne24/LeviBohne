@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<!-- just copy and paste your code from gemini -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Memory Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Press Start 2P', cursive;
+            /* Background image of a basketball half court */
+            background: url('https://images.unsplash.com/photo-1519861531473-9200262188bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1742&q=80') no-repeat center center fixed;
+            background-size: cover;
+            /* Ensure text is readable over the background */
+            text-shadow: 1px 1px 2px black;
+            color: white; /* Default text color */
+        }
+
+        .game-container {
+            /* Add a semi-transparent overlay to improve readability */
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .card {
+            width: 100px; /* Fixed width */
+            height: 140px; /* Fixed height */
+            perspective: 1000px; /* For 3D flip effect */
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 8px; /* Rounded corners for the card */
+            border: 2px solid black; /* Black outline */
+        }
+
+        /* Add the flip class when card is clicked */
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            border-radius: 6px; /* Slightly smaller radius to fit inside border */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-front {
+            /* Style for the back of the card (visible initially) */
+            background-color: #4a4a4a; /* Dark gray */
+            color: white;
+            /* Simple basketball icon/pattern */
+             background-image: radial-gradient(circle, #ff7f00 50%, transparent 51%),
+                             radial-gradient(circle, #ff7f00 50%, transparent 51%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            border: 1px solid #ff7f00; /* Orange border */
+        }
+         .card-front::before {
+            content: "?"; /* Question mark on card back */
+            font-size: 3rem;
+            color: white;
+         }
+
+
+        .card-back {
+            /* Style for the front of the card (player image) */
+            background-color: white; /* White background */
+            color: black;
+            transform: rotateY(180deg);
+            padding: 5px; /* Padding around the image */
+            overflow: hidden; /* Hide image overflow */
+        }
+
+        .card-back img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover; /* Scale image nicely */
+            border-radius: 4px; /* Rounded corners for image */
+        }
+
+        /* Grid layout adjustments based on difficulty */
+        #game-board.easy { /* 10 cards */
+            grid-template-columns: repeat(5, minmax(0, 1fr)); /* 5 columns, 2 rows */
+        }
+        #game-board.medium { /* 20 cards */
+            grid-template-columns: repeat(5, minmax(0, 1fr)); /* 5 columns, 4 rows */
+        }
+        #game-board.hard { /* 30 cards */
+            grid-template-columns: repeat(6, minmax(0, 1fr)); /* 6 columns, 5 rows */
+        }
+
+        /* Message styling */
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px 50px;
+            border-radius: 15px;
+            font-size: 3rem; /* Larger font size */
+            z-index: 100;
+            display: none; /* Hidden by default */
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 4px solid white;
+        }
+
+        .message.correct {
+            background-color: rgba(76, 175, 80, 0.9); /* Green with transparency */
+            color: white;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        .message.wrong {
+            background-color: rgba(244, 67, 54, 0.9); /* Red with transparency */
+            color: white;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        .message.well-done {
+            background-color: rgba(33, 150, 243, 0.9); /* Blue with transparency */
+            color: white;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        /* Button Styling */
+        .difficulty-btn, #restart-btn {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #ff7f00; /* NBA Orange */
+            color: white;
+            border: 2px solid black;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            text-shadow: 1px 1px 1px black;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.3);
+        }
+
+        .difficulty-btn:hover, #restart-btn:hover {
+            background-color: #e67300; /* Darker orange */
+        }
+         .difficulty-btn:active, #restart-btn:active {
+             transform: translateY(2px);
+             box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+         }
+
+        .difficulty-btn.active {
+            background-color: #cc6600; /* Even darker for active */
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+        }
+
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="game-container w-full max-w-4xl mx-auto">
+        <h1 class="text-3xl text-center mb-6 text-white">NBA Memory Game</h1>
+
+        <div id="difficulty-selection" class="text-center mb-6">
+            <h2 class="text-xl mb-3 text-white">Select Difficulty:</h2>
+            <button class="difficulty-btn" data-difficulty="easy">Easy (5 Pairs)</button>
+            <button class="difficulty-btn" data-difficulty="medium">Medium (10 Pairs)</button>
+            <button class="difficulty-btn" data-difficulty="hard">Hard (15 Pairs)</button>
+        </div>
+
+        <div id="game-board" class="grid gap-3 justify-center">
+            </div>
+
+         <div class="text-center mt-6">
+            <button id="restart-btn" class="hidden">Play Again?</button>
+        </div>
+    </div>
+
+    <div id="message-correct" class="message correct">CORRECT!</div>
+    <div id="message-wrong" class="message wrong">WRONG!</div>
+    <div id="message-well-done" class="message well-done">WELL DONE!</div>
+
+    <script>
+        // --- Player Data ---
+        // Updated player lists and placeholder text with full names
+        const players = {
+            easy: [ // 5 Pairs
+                { id: 1, name: "LeBron James", img: "https://placehold.co/100x140/orange/white?text=LeBron+James" },
+                { id: 2, name: "Stephen Curry", img: "https://placehold.co/100x140/blue/white?text=Stephen+Curry" },
+                { id: 3, name: "Kevin Durant", img: "https://placehold.co/100x140/black/white?text=Kevin+Durant" },
+                { id: 6, name: "Nikola Jokić", img: "https://placehold.co/100x140/navy/white?text=Nikola+Jokic" }, // Note: Jokić uses 'c'
+                { id: 10, name: "Victor Wembanyama", img: "https://placehold.co/100x140/silver/black?text=Victor+W." }, // Keep short for space if needed
+            ],
+            medium: [ // 10 Pairs (Easy + 5 more)
+                { id: 1, name: "LeBron James", img: "https://placehold.co/100x140/orange/white?text=LeBron+James" },
+                { id: 2, name: "Stephen Curry", img: "https://placehold.co/100x140/blue/white?text=Stephen+Curry" },
+                { id: 3, name: "Kevin Durant", img: "https://placehold.co/100x140/black/white?text=Kevin+Durant" },
+                { id: 6, name: "Nikola Jokić", img: "https://placehold.co/100x140/navy/white?text=Nikola+Jokic" },
+                { id: 10, name: "Victor Wembanyama", img: "https://placehold.co/100x140/silver/black?text=Victor+W." },
+                { id: 4, name: "Giannis Antetokounmpo", img: "https://placehold.co/100x140/green/white?text=Giannis+A." }, // Keep short for space
+                { id: 5, name: "Luka Dončić", img: "https://placehold.co/100x140/lightblue/black?text=Luka+Doncic" }, // Note: Dončić uses 'c'
+                { id: 7, name: "Joel Embiid", img: "https://placehold.co/100x140/red/white?text=Joel+Embiid" },
+                { id: 8, name: "Jayson Tatum", img: "https://placehold.co/100x140/darkgreen/white?text=Jayson+Tatum" },
+                { id: 9, name: "Devin Booker", img: "https://placehold.co/100x140/purple/white?text=Devin+Booker" },
+            ],
+            hard: [ // 15 Pairs (Medium + 5 Legends)
+                { id: 1, name: "LeBron James", img: "https://placehold.co/100x140/orange/white?text=LeBron+James" },
+                { id: 2, name: "Stephen Curry", img: "https://placehold.co/100x140/blue/white?text=Stephen+Curry" },
+                { id: 3, name: "Kevin Durant", img: "https://placehold.co/100x140/black/white?text=Kevin+Durant" },
+                { id: 6, name: "Nikola Jokić", img: "https://placehold.co/100x140/navy/white?text=Nikola+Jokic" },
+                { id: 10, name: "Victor Wembanyama", img: "https://placehold.co/100x140/silver/black?text=Victor+W." },
+                { id: 4, name: "Giannis Antetokounmpo", img: "https://placehold.co/100x140/green/white?text=Giannis+A." },
+                { id: 5, name: "Luka Dončić", img: "https://placehold.co/100x140/lightblue/black?text=Luka+Doncic" },
+                { id: 7, name: "Joel Embiid", img: "https://placehold.co/100x140/red/white?text=Joel+Embiid" },
+                { id: 8, name: "Jayson Tatum", img: "https://placehold.co/100x140/darkgreen/white?text=Jayson+Tatum" },
+                { id: 9, name: "Devin Booker", img: "https://placehold.co/100x140/purple/white?text=Devin+Booker" },
+                { id: 11, name: "Michael Jordan", img: "https://placehold.co/100x140/red/black?text=Michael+Jordan" },
+                { id: 19, name: "Kobe Bryant", img: "https://placehold.co/100x140/purple/yellow?text=Kobe+Bryant" },
+                { id: 17, name: "Shaquille O'Neal", img: "https://placehold.co/100x140/purple/gold?text=Shaquille+O." }, // Keep short
+                { id: 13, name: "Magic Johnson", img: "https://placehold.co/100x140/yellow/purple?text=Magic+Johnson" },
+                { id: 14, name: "Larry Bird", img: "https://placehold.co/100x140/green/black?text=Larry+Bird" },
+            ]
+        };
+
+        // --- Game State Variables ---
+        let currentDifficulty = null;
+        let cards = []; // Holds the card data for the current game
+        let flippedCards = []; // Tracks the two currently flipped cards
+        let matchedPairs = 0;
+        let totalPairs = 0;
+        let canFlip = true; // Prevents flipping more than 2 cards or during delays
+
+        // --- DOM Elements ---
+        const gameBoard = document.getElementById('game-board');
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        const messageCorrect = document.getElementById('message-correct');
+        const messageWrong = document.getElementById('message-wrong');
+        const messageWellDone = document.getElementById('message-well-done');
+        const restartButton = document.getElementById('restart-btn');
+        const difficultySelectionDiv = document.getElementById('difficulty-selection');
+
+        // --- Functions ---
+
+        /**
+         * Shuffles an array in place using the Fisher-Yates algorithm.
+         * @param {Array} array - The array to shuffle.
+         */
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+        }
+
+        /**
+         * Creates the HTML for a single card.
+         * @param {object} cardData - Object containing card id, name, and img url.
+         * @returns {HTMLElement} - The card element.
+         */
+        function createCardElement(cardData) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.id = cardData.id; // Store the player ID on the card element
+
+            // Use an error handler for the image
+            const placeholderImg = `https://placehold.co/100x140/cccccc/ffffff?text=Error`;
+
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front">
+                        </div>
+                    <div class="card-back">
+                        <img src="${cardData.img}" alt="NBA Player ${cardData.name}" onerror="this.onerror=null;this.src='${placeholderImg}';">
+                    </div>
+                </div>
+            `;
+
+            // Add event listener for flipping
+            card.addEventListener('click', handleCardClick);
+            return card;
+        }
+
+        /**
+         * Initializes the game board for the selected difficulty.
+         * @param {string} difficulty - 'easy', 'medium', or 'hard'.
+         */
+        function initGame(difficulty) {
+            // Set current difficulty and highlight button
+            currentDifficulty = difficulty;
+            difficultyButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.difficulty === difficulty);
+                btn.disabled = true; // Disable buttons during game
+            });
+            difficultySelectionDiv.classList.add('hidden'); // Hide difficulty selection
+
+
+            // Get player data for the chosen difficulty
+            const selectedPlayers = players[difficulty];
+            totalPairs = selectedPlayers.length;
+            matchedPairs = 0; // Reset matched pairs count
+
+            // Duplicate players to create pairs and shuffle
+            cards = [...selectedPlayers, ...selectedPlayers]; // Create pairs
+            shuffle(cards);
+
+            // Clear previous board and set grid columns
+            gameBoard.innerHTML = '';
+            // Updated grid classes based on new difficulty sizes
+            gameBoard.className = `grid gap-3 justify-center ${difficulty}`;
+
+            // Create and append card elements
+            cards.forEach(cardData => {
+                const cardElement = createCardElement(cardData);
+                gameBoard.appendChild(cardElement);
+            });
+
+            // Reset game state
+            flippedCards = [];
+            canFlip = true;
+            hideMessages();
+            restartButton.classList.add('hidden'); // Hide restart button initially
+        }
+
+        /**
+         * Handles the logic when a card is clicked.
+         */
+        function handleCardClick(event) {
+            // Get the card element that was clicked
+            const clickedCard = event.currentTarget;
+
+            // Exit if flipping is disabled, card is already flipped, or already matched
+            if (!canFlip || clickedCard.classList.contains('flipped') || clickedCard.classList.contains('matched')) {
+                return;
+            }
+
+            // Flip the card
+            flipCard(clickedCard);
+            flippedCards.push(clickedCard);
+
+            // Check if two cards are flipped
+            if (flippedCards.length === 2) {
+                canFlip = false; // Disable further flips temporarily
+                checkForMatch();
+            }
+        }
+
+        /**
+         * Adds the 'flipped' class to visually flip the card.
+         * @param {HTMLElement} card - The card element to flip.
+         */
+        function flipCard(card) {
+            card.classList.add('flipped');
+        }
+
+        /**
+         * Removes the 'flipped' class to flip the card back over.
+         * @param {HTMLElement} card - The card element to flip back.
+         */
+        function unflipCard(card) {
+            card.classList.remove('flipped');
+        }
+
+        /**
+         * Checks if the two currently flipped cards are a match.
+         */
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            const id1 = card1.dataset.id;
+            const id2 = card2.dataset.id;
+
+            if (id1 === id2) {
+                // It's a match!
+                showTemporaryMessage(messageCorrect);
+                card1.classList.add('matched'); // Mark as matched
+                card2.classList.add('matched'); // Mark as matched
+                // Prevent clicking matched cards again
+                card1.removeEventListener('click', handleCardClick);
+                card2.removeEventListener('click', handleCardClick);
+                matchedPairs++;
+                flippedCards = []; // Reset flipped cards array
+                canFlip = true; // Allow flipping again
+
+                // Check if the game is won
+                if (matchedPairs === totalPairs) {
+                    setTimeout(() => {
+                        showPermanentMessage(messageWellDone);
+                        restartButton.classList.remove('hidden'); // Show restart button
+                    }, 500); // Show "Well Done" after a short delay
+                }
+            } else {
+                // Not a match
+                showTemporaryMessage(messageWrong);
+                // Flip cards back after a delay
+                setTimeout(() => {
+                    unflipCard(card1);
+                    unflipCard(card2);
+                    flippedCards = []; // Reset flipped cards array
+                    canFlip = true; // Allow flipping again
+                }, 1200); // Wait longer so user can see the cards
+            }
+        }
+
+        /**
+         * Shows a message element temporarily.
+         * @param {HTMLElement} messageElement - The DOM element of the message to show.
+         */
+        function showTemporaryMessage(messageElement) {
+            messageElement.style.display = 'block';
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 1000); // Display message for 1 second
+        }
+
+         /**
+         * Shows a message element permanently until reset.
+         * @param {HTMLElement} messageElement - The DOM element of the message to show.
+         */
+        function showPermanentMessage(messageElement) {
+            messageElement.style.display = 'block';
+        }
+
+        /**
+         * Hides all message popups.
+         */
+        function hideMessages() {
+            messageCorrect.style.display = 'none';
+            messageWrong.style.display = 'none';
+            messageWellDone.style.display = 'none';
+        }
+
+        /**
+         * Resets the game to the difficulty selection state.
+         */
+        function resetGame() {
+            gameBoard.innerHTML = ''; // Clear board
+            gameBoard.className = 'grid gap-3 justify-center'; // Reset grid classes
+            hideMessages();
+            difficultySelectionDiv.classList.remove('hidden'); // Show difficulty selection
+            difficultyButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.disabled = false; // Re-enable buttons
+            });
+            restartButton.classList.add('hidden'); // Hide restart button
+            currentDifficulty = null;
+            matchedPairs = 0;
+            totalPairs = 0;
+            cards = [];
+            flippedCards = [];
+            canFlip = true;
+        }
+
+
+        // --- Event Listeners ---
+
+        // Add listeners to difficulty buttons
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const difficulty = button.dataset.difficulty;
+                initGame(difficulty);
+            });
+        });
+
+         // Add listener to restart button
+        restartButton.addEventListener('click', resetGame);
+
+        // --- Initial Setup ---
+        // No game started initially, wait for user selection.
+
+    </script>
+
+</body>
+</html>
